@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Hash Pipe Is Right for You?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green:   #1B3A2F;
+    --green-light: #2a5444;
+    --white:   #FFFFFF;
+    --cream:   #F7F5F0;
+    --pink:    #E8C5B8;
+    --lavender:#C8C0D8;
+    --sage:    #A8BBA6;
+    --text:    #1B3A2F;
+    --radius:  12px;
+  }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: transparent;
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px 40px;
+  }
+
+  .quiz-wrap {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  /* ── Header ── */
+  .quiz-header {
+    background: var(--green);
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 28px 28px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .quiz-header::before {
+    content: '';
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    top: -60px; right: -40px;
+  }
+  .quiz-header::after {
+    content: '';
+    position: absolute;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    bottom: -30px; left: -20px;
+  }
+  .quiz-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 8px;
+    position: relative; z-index: 1;
+  }
+  .quiz-title {
+    font-size: clamp(20px, 5vw, 26px);
+    font-weight: 700;
+    color: var(--white);
+    position: relative; z-index: 1;
+    line-height: 1.25;
+  }
+  .quiz-subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 8px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── Progress ── */
+  .progress-bar-wrap {
+    background: var(--green);
+    padding: 0 28px 20px;
+  }
+  .progress-track {
+    background: rgba(255,255,255,0.15);
+    height: 4px;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--sage);
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .progress-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 6px;
+    text-align: right;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Body ── */
+  .quiz-body {
+    background: var(--white);
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 28px;
+    box-shadow: 0 8px 40px rgba(27,58,47,0.12);
+  }
+
+  /* ── Question ── */
+  .question-block { display: none; }
+  .question-block.active { display: block; animation: fadeUp 0.3s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .question-hint {
+    font-size: 13px;
+    color: #6b7e75;
+    margin-bottom: 20px;
+  }
+
+  /* ── Options ── */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 420px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+
+  .opt-btn {
+    border: 2px solid #E2EAE6;
+    background: var(--cream);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-family: inherit;
+  }
+  .opt-btn:hover {
+    border-color: var(--green);
+    background: #EEF4F0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(27,58,47,0.1);
+  }
+  .opt-btn.selected {
+    border-color: var(--green);
+    background: var(--green);
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(27,58,47,0.18);
+  }
+  .opt-emoji {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .opt-label {
+    font-size: 14px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .opt-desc {
+    font-size: 12px;
+    opacity: 0.7;
+    font-weight: 400;
+    display: block;
+    line-height: 1.35;
+  }
+  .opt-btn.selected .opt-desc { opacity: 0.75; }
+
+  /* ── Nav ── */
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 22px;
+    gap: 10px;
+  }
+  .btn-back {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7e75;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .btn-back.visible { opacity: 1; pointer-events: auto; }
+  .btn-back:hover { color: var(--green); }
+
+  .btn-next {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
+    background: var(--green);
+    border: none;
+    border-radius: var(--radius);
+    padding: 12px 24px;
+    cursor: pointer;
+    opacity: 0.4;
+    pointer-events: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .btn-next.enabled {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .btn-next.enabled:hover {
+    background: var(--green-light);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(27,58,47,0.2);
+  }
+
+  /* ── Result ── */
+  .result-block { display: none; }
+  .result-block.active { display: block; animation: fadeUp 0.4s ease; }
+
+  .result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--sage);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 99px;
+    padding: 5px 12px;
+    margin-bottom: 14px;
+  }
+  .result-hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--cream);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 18px;
+    border: 2px solid #E2EAE6;
+  }
+  .result-icon { font-size: 52px; line-height: 1; flex-shrink: 0; }
+  .result-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+  .result-tagline { font-size: 13px; color: #6b7e75; }
+
+  .traits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 420px) { .traits-grid { grid-template-columns: 1fr; } }
+
+  .trait-pill {
+    background: var(--cream);
+    border: 1px solid #E2EAE6;
+    border-radius: var(--radius);
+    padding: 10px 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .trait-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  .result-tip {
+    background: #EEF4F0;
+    border-left: 3px solid var(--green);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 13px 16px;
+    font-size: 13px;
+    color: var(--green);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .result-tip strong { font-weight: 700; }
+
+  .cta-block {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn-cta-primary {
+    flex: 1;
+    min-width: 140px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
+    background: var(--green);
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s;
+  }
+  .btn-cta-primary:hover {
+    background: var(--green-light);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(27,58,47,0.2);
+  }
+  .btn-retake {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7e75;
+    background: none;
+    border: 2px solid #E2EAE6;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-retake:hover { border-color: var(--green); color: var(--green); }
+
+  /* ── Disclaimer ── */
+  .disclaimer {
+    margin-top: 16px;
+    font-size: 11px;
+    color: #9aaba4;
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-wrap">
+
+  <!-- Header -->
+  <div class="quiz-header">
+    <p class="quiz-eyebrow">Hash Pipe Guide</p>
+    <h2 class="quiz-title">Which Hash Pipe Is Right for You?</h2>
+    <p class="quiz-subtitle">Answer 4 quick questions — get a tailored pick.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <p class="progress-label" id="progressLabel">Question 1 of 4</p>
+  </div>
+
+  <!-- Body -->
+  <div class="quiz-body">
+
+    <!-- Q1 -->
+    <div class="question-block active" id="q1">
+      <p class="question-text">What matters most to you?</p>
+      <p class="question-hint">Pick the one that feels most like you.</p>
+      <div class="options-grid">
+        <button class="opt-btn" onclick="pick(this,'flavor')">
+          <span class="opt-emoji">👅</span>
+          <span><span class="opt-label">Pure flavor</span><span class="opt-desc">Every terpene, nothing lost</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'durability')">
+          <span class="opt-emoji">💪</span>
+          <span><span class="opt-label">Built tough</span><span class="opt-desc">Drop it, clean it, repeat</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'portability')">
+          <span class="opt-emoji">🎒</span>
+          <span><span class="opt-label">Pocket-friendly</span><span class="opt-desc">Compact, go anywhere</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'easy')">
+          <span class="opt-emoji">✨</span>
+          <span><span class="opt-label">Easy sessions</span><span class="opt-desc">Simple setup, smooth hit</span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" id="q2">
+      <p class="question-text">How often will you clean it?</p>
+      <p class="question-hint">Be honest — no wrong answers here.</p>
+      <div class="options-grid">
+        <button class="opt-btn" onclick="pick(this,'always')">
+          <span class="opt-emoji">🧼</span>
+          <span><span class="opt-label">After every use</span><span class="opt-desc">I enjoy the ritual</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'weekly')">
+          <span class="opt-emoji">📅</span>
+          <span><span class="opt-label">Once a week</span><span class="opt-desc">Regular but not obsessive</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'monthly')">
+          <span class="opt-emoji">😅</span>
+          <span><span class="opt-label">When I remember</span><span class="opt-desc">Low-maintenance preferred</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'never')">
+          <span class="opt-emoji">🤷</span>
+          <span><span class="opt-label">Rarely / never</span><span class="opt-desc">Just make it easy</span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" id="q3">
+      <p class="question-text">How do you usually smoke?</p>
+      <p class="question-hint">Think about your most common setting.</p>
+      <div class="options-grid">
+        <button class="opt-btn" onclick="pick(this,'solo')">
+          <span class="opt-emoji">🏠</span>
+          <span><span class="opt-label">Solo at home</span><span class="opt-desc">My own couch, my own rules</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'friends')">
+          <span class="opt-emoji">👥</span>
+          <span><span class="opt-label">With friends</span><span class="opt-desc">Pass it around the circle</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'outside')">
+          <span class="opt-emoji">🌿</span>
+          <span><span class="opt-label">Outdoors / on the go</span><span class="opt-desc">Trails, parks, travel</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'ceremony')">
+          <span class="opt-emoji">🕯️</span>
+          <span><span class="opt-label">Slow & intentional</span><span class="opt-desc">Ritual, not rushing</span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" id="q4">
+      <p class="question-text">What type of hash do you prefer?</p>
+      <p class="question-hint">Or what you're curious to try.</p>
+      <div class="options-grid">
+        <button class="opt-btn" onclick="pick(this,'pressed')">
+          <span class="opt-emoji">🧱</span>
+          <span><span class="opt-label">Pressed / brick</span><span class="opt-desc">Classic Afghan or Moroccan</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'temple')">
+          <span class="opt-emoji">⚽</span>
+          <span><span class="opt-label">Temple balls</span><span class="opt-desc">Hand-rolled, resinous</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'bubble')">
+          <span class="opt-emoji">💧</span>
+          <span><span class="opt-label">Bubble / full-melt</span><span class="opt-desc">Refined ice-water extract</span></span>
+        </button>
+        <button class="opt-btn" onclick="pick(this,'mix')">
+          <span class="opt-emoji">🎲</span>
+          <span><span class="opt-label">Mix it up</span><span class="opt-desc">I try everything</span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-block" id="resultBlock">
+      <div class="result-badge">✦ Your Match</div>
+      <div class="result-hero">
+        <div class="result-icon" id="rIcon"></div>
+        <div>
+          <div class="result-name" id="rName"></div>
+          <div class="result-tagline" id="rTagline"></div>
+        </div>
+      </div>
+      <div class="traits-grid" id="rTraits"></div>
+      <div class="result-tip" id="rTip"></div>
+      <div class="cta-block">
+        <a href="https://mood.com/shop/product-category/concentrates/hash" class="btn-cta-primary" target="_blank">Shop Hash Concentrates →</a>
+        <button class="btn-retake" onclick="restartQuiz()">↺ Retake</button>
+      </div>
+      <p class="disclaimer">Mood is not a medical authority. Please use responsibly and in accordance with your local laws.</p>
+    </div>
+
+    <!-- Nav -->
+    <div class="quiz-nav" id="quizNav">
+      <button class="btn-back" id="btnBack" onclick="goBack()">← Back</button>
+      <button class="btn-next" id="btnNext" onclick="goNext()">Next <span>→</span></button>
+    </div>
+
+  </div><!-- /quiz-body -->
+</div><!-- /quiz-wrap -->
+
+<script>
+  const TOTAL = 4;
+  let currentQ = 1;
+  let answers = {};
+
+  const results = {
+    glass: {
+      icon: '🔮',
+      name: 'Glass Spoon Pipe',
+      tagline: 'The flavor purist\'s choice',
+      traits: [
+        { color: '#A8BBA6', text: 'Cleanest terpene expression' },
+        { color: '#C8C0D8', text: 'Inert, non-reactive surface' },
+        { color: '#E8C5B8', text: 'Easy to clean with alcohol + salt' },
+        { color: '#A8BBA6', text: 'Pairs best with a mesh screen' },
+      ],
+      tip: '<strong>Pro tip:</strong> Use a fine stainless steel mesh screen in the bowl. It catches melted hash before it enters the stem, preventing clogs and waste. Apply gentle, indirect heat just above the surface.'
+    },
+    metal: {
+      icon: '🔧',
+      name: 'Metal Pipe',
+      tagline: 'Built for everyday adventures',
+      traits: [
+        { color: '#A8BBA6', text: 'Drop-proof & travel-ready' },
+        { color: '#C8C0D8', text: 'Fully disassembles for deep cleans' },
+        { color: '#E8C5B8', text: 'Stainless steel or brass options' },
+        { color: '#A8BBA6', text: 'Heats faster — grip with care' },
+      ],
+      tip: '<strong>Pro tip:</strong> Metal conducts heat quickly, so monitor the pipe temperature during longer sessions. Stainless steel gives the cleanest flavor; brass is also a solid choice. Always pair with a mesh screen for hash.'
+    },
+    chillum: {
+      icon: '🌿',
+      name: 'Chillum',
+      tagline: 'Compact, classic, no fuss',
+      traits: [
+        { color: '#A8BBA6', text: 'Ultra-portable straight tube' },
+        { color: '#C8C0D8', text: 'No carb — adjust draw technique' },
+        { color: '#E8C5B8', text: 'Perfect for small amounts' },
+        { color: '#A8BBA6', text: 'Traditional hash-smoking format' },
+      ],
+      tip: '<strong>Pro tip:</strong> Chillums have no carb hole, so control airflow with your draw pace. Place hash on a screen, hold flame just above the material, and inhale slowly. Start with a smaller piece than you think you need.'
+    },
+    ceramic: {
+      icon: '🏺',
+      name: 'Ceramic or Quartz Pipe',
+      tagline: 'Even heat, lasting ritual',
+      traits: [
+        { color: '#A8BBA6', text: 'Retains heat evenly, no scorching' },
+        { color: '#C8C0D8', text: 'Heavier but very durable' },
+        { color: '#E8C5B8', text: 'Often beautifully glazed' },
+        { color: '#A8BBA6', text: 'Quartz matches glass for purity' },
+      ],
+      tip: '<strong>Pro tip:</strong> Ceramic\'s heat retention makes it ideal for slow, ceremonial sessions with temple balls or high-quality pressed hash. Use indirect heat — the material stays warm and hash smolders gently without scorching.'
+    }
+  };
+
+  function getResult() {
+    const a = answers;
+    // Weighted logic based on all 4 answers
+    let scores = { glass: 0, metal: 0, chillum: 0, ceramic: 0 };
+
+    // Q1: priority
+    if (a[1] === 'flavor' || a[1] === 'easy') scores.glass += 2;
+    if (a[1] === 'durability') scores.metal += 2;
+    if (a[1] === 'portability') { scores.chillum += 2; scores.metal += 1; }
+    if (a[1] === 'easy') scores.ceramic += 1;
+
+    // Q2: cleaning
+    if (a[2] === 'always' || a[2] === 'weekly') { scores.glass += 2; scores.ceramic += 1; }
+    if (a[2] === 'monthly') { scores.metal += 1; scores.glass += 1; }
+    if (a[2] === 'never') { scores.metal += 2; scores.chillum += 1; }
+
+    // Q3: session style
+    if (a[3] === 'solo' || a[3] === 'ceremony') { scores.glass += 1; scores.ceramic += 2; }
+    if (a[3] === 'friends') { scores.glass += 1; scores.metal += 1; }
+    if (a[3] === 'outside') { scores.chillum += 2; scores.metal += 2; }
+
+    // Q4: hash type
+    if (a[4] === 'pressed') { scores.glass += 1; scores.metal += 1; }
+    if (a[4] === 'temple' || a[4] === 'ceremony') { scores.ceramic += 2; scores.glass += 1; }
+    if (a[4] === 'bubble') { scores.glass += 2; scores.ceramic += 1; }
+    if (a[4] === 'mix') { scores.metal += 1; scores.glass += 1; }
+
+    return Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+  }
+
+  function pick(btn, value) {
+    const block = btn.closest('.question-block');
+    block.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    answers[currentQ] = value;
+    document.getElementById('btnNext').classList.add('enabled');
+  }
+
+  function updateProgress() {
+    const pct = ((currentQ - 1) / TOTAL) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = `Question ${currentQ} of ${TOTAL}`;
+  }
+
+  function goNext() {
+    if (!answers[currentQ]) return;
+
+    if (currentQ < TOTAL) {
+      document.getElementById('q' + currentQ).classList.remove('active');
+      currentQ++;
+      document.getElementById('q' + currentQ).classList.add('active');
+      document.getElementById('btnNext').classList.remove('enabled');
+      document.getElementById('btnBack').classList.add('visible');
+      updateProgress();
+      if (currentQ === TOTAL) {
+        document.getElementById('btnNext').innerHTML = 'See my result ✦';
+      }
+    } else {
+      showResult();
+    }
+  }
+
+  function goBack() {
+    if (currentQ <= 1) return;
+    document.getElementById('q' + currentQ).classList.remove('active');
+    currentQ--;
+    document.getElementById('q' + currentQ).classList.add('active');
+    document.getElementById('btnNext').innerHTML = currentQ === TOTAL ? 'See my result ✦' : 'Next →';
+    document.getElementById('btnNext').classList.add('enabled');
+    if (currentQ === 1) document.getElementById('btnBack').classList.remove('visible');
+    updateProgress();
+  }
+
+  function showResult() {
+    document.getElementById('q' + currentQ).classList.remove('active');
+    document.getElementById('quizNav').style.display = 'none';
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressLabel').textContent = 'Complete!';
+
+    const key = getResult();
+    const r = results[key];
+
+    document.getElementById('rIcon').textContent = r.icon;
+    document.getElementById('rName').textContent = r.name;
+    document.getElementById('rTagline').textContent = r.tagline;
+    document.getElementById('rTip').innerHTML = r.tip;
+
+    const grid = document.getElementById('rTraits');
+    grid.innerHTML = r.traits.map(t =>
+      `<div class="trait-pill"><span class="trait-dot" style="background:${t.color}"></span>${t.text}</div>`
+    ).join('');
+
+    document.getElementById('resultBlock').classList.add('active');
+  }
+
+  function restartQuiz() {
+    document.getElementById('resultBlock').classList.remove('active');
+    answers = {};
+    currentQ = 1;
+    document.querySelectorAll('.question-block').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('q1').classList.add('active');
+    document.getElementById('quizNav').style.display = 'flex';
+    document.getElementById('btnNext').classList.remove('enabled');
+    document.getElementById('btnNext').innerHTML = 'Next →';
+    document.getElementById('btnBack').classList.remove('visible');
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressLabel').textContent = 'Question 1 of 4';
+  }
+</script>
+</body>
+</html>
